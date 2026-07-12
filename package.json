@@ -7,13 +7,16 @@
     "test:e2e": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright playwright test",
     "test:headed": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright playwright test --headed",
     "report": "playwright show-report",
-    "install:browsers": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright playwright install chromium"
+    "install:browsers": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright playwright install chromium",
+    "test:bdd": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright cucumber-js",
+    "test:bdd:headed": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright HEADED=true cucumber-js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@cucumber/cucumber": "^13.0.0",
     "@playwright/test": "^1.61.1",
     "cross-env": "^10.1.0"
   }

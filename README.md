@@ -34,12 +34,34 @@ Os cenarios automatizados cobrem:
 - `navigation.spec.js`: menu, 404 e responsividade.
 - `agendamento.e2e.spec.js`: jornada ponta a ponta completa.
 
+## Suite BDD/Gherkin
+
+Tambem existe uma camada BDD com Cucumber + Playwright:
+
+- `features/autenticacao.feature`: acesso protegido, login valido e usuario bloqueado.
+- `features/agendamento.feature`: criacao de agendamento e validacao de telefone.
+- `features/cancelamento.feature`: cancelamento de agendamento confirmado.
+- `features/step-definitions/agendalab.steps.js`: steps que executam as acoes no navegador.
+- `features/support/world.js`: configuracao do navegador para cada cenario.
+
 ## Como executar
 
 ```bash
 npm install
 npm run install:browsers
 npm run test:e2e
+```
+
+Para executar os cenarios BDD:
+
+```bash
+npm run test:bdd
+```
+
+Para executar os cenarios BDD com o navegador aberto:
+
+```bash
+npm run test:bdd:headed
 ```
 
 Para abrir o relatorio HTML apos a execucao:
