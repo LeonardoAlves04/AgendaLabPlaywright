@@ -19,7 +19,7 @@ async function loginAsNormalUser(page) {
   await page.getByRole('button', { name: /^Entrar$/ }).click();
 
   await expect(page).toHaveURL(/\/dashboard$/);
-  await expect(page.getByRole('heading', { name: /Ola, Usuario Normal|Olá, Usuário Normal/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Ola, Usuario Normal|Ol., Usu.rio Normal/i })).toBeVisible();
 }
 
 async function resetData(page) {
@@ -42,13 +42,13 @@ async function fillValidAppointment(page, customer, overrides = {}) {
     ...overrides,
   };
 
-  await page.getByLabel(/Nome do cliente/i).fill(appointment.customer);
-  await page.getByLabel(/Telefone/i).fill(appointment.phone);
-  await page.getByLabel(/Servico|Serviço/i).selectOption({ index: 1 });
-  await page.getByLabel(/Profissional/i).selectOption({ label: appointment.professional });
-  await page.getByLabel(/Data/i).fill(appointment.date);
-  await page.getByLabel(/Horario|Horário/i).selectOption({ label: appointment.time });
-  await page.getByLabel(/Observacoes|Observações/i).fill(appointment.notes);
+  await page.locator('#clientName').fill(appointment.customer);
+  await page.locator('#clientPhone').fill(appointment.phone);
+  await page.locator('#serviceId').selectOption({ index: 1 });
+  await page.locator('#professionalId').selectOption({ label: appointment.professional });
+  await page.locator('#date').fill(appointment.date);
+  await page.locator('#time').selectOption({ label: appointment.time });
+  await page.locator('#notes').fill(appointment.notes);
 
   return appointment;
 }
@@ -68,6 +68,13 @@ Given('os dados de teste foram resetados', async function () {
 Given('que existe um agendamento confirmado para {string}', async function (customer) {
   await this.page.goto('/new-appointment');
   this.appointment = await fillValidAppointment(this.page, customer);
+  await this.page.getByRole('button', { name: /Confirmar Agendamento/i }).click();
+  await expect(this.page.getByText(/agendamento.*sucesso|criado.*sucesso/i)).toBeVisible();
+});
+
+Given('que existe um agendamento confirmado para {string} as {string}', async function (customer, time) {
+  await this.page.goto('/new-appointment');
+  this.appointment = await fillValidAppointment(this.page, customer, { time });
   await this.page.getByRole('button', { name: /Confirmar Agendamento/i }).click();
   await expect(this.page.getByText(/agendamento.*sucesso|criado.*sucesso/i)).toBeVisible();
 });
@@ -105,8 +112,32 @@ When('preencho um agendamento com telefone invalido para {string}', async functi
   });
 });
 
+When('seleciono o mesmo profissional e data do agendamento existente', async function () {
+  await this.page.locator('#serviceId').selectOption({ index: 1 });
+  await this.page.locator('#professionalId').selectOption({ label: this.appointment.professional });
+  await this.page.locator('#date').fill(this.appointment.date);
+});
+
 When('confirmo o agendamento', async function () {
   await this.page.getByRole('button', { name: /Confirmar Agendamento/i }).click();
+});
+
+When('reagendo o agendamento {string} para um novo horario', async function (customer) {
+  this.rescheduledAppointment = {
+    date: nextValidBusinessDate(15),
+    time: '16:00',
+  };
+
+  await this.page
+    .locator('article')
+    .filter({ hasText: customer })
+    .getByRole('button', { name: /Reagendar/i })
+    .click();
+
+  await expect(this.page).toHaveURL(/\/reschedule\//);
+  await this.page.locator('#reschedule-date').fill(this.rescheduledAppointment.date);
+  await this.page.locator('#reschedule-time').selectOption({ label: this.rescheduledAppointment.time });
+  await this.page.getByRole('button', { name: /Confirmar Reagendamento/i }).click();
 });
 
 When('cancelo o agendamento {string}', async function (customer) {
@@ -126,7 +157,7 @@ Then('devo ser redirecionado para a pagina de login', async function () {
 
 Then('devo visualizar o dashboard do usuario normal', async function () {
   await expect(this.page).toHaveURL(/\/dashboard$/);
-  await expect(this.page.getByRole('heading', { name: /Ola, Usuario Normal|Olá, Usuário Normal/i })).toBeVisible();
+  await expect(this.page.getByRole('heading', { name: /Ola, Usuario Normal|Ol., Usu.rio Normal/i })).toBeVisible();
 });
 
 Then('devo ver a mensagem de acesso bloqueado', async function () {
@@ -143,7 +174,20 @@ Then('devo continuar na pagina de novo agendamento', async function () {
 });
 
 Then('devo ver uma mensagem de erro sobre telefone', async function () {
-  await expect(this.page.getByText(/telefone|digitos|dígitos|numeros|números/i).first()).toBeVisible();
+  await expect(this.page.getByText(/telefone|digitos|d.gitos|numeros|n.meros/i).first()).toBeVisible();
+});
+
+Then('o horario {string} deve estar indisponivel para novo agendamento', async function (time) {
+  const timeSelect = this.page.locator('#time');
+  await expect(timeSelect).toBeVisible();
+
+  const availableTimes = await timeSelect.locator('option').evaluateAll((options) =>
+    options
+      .filter((option) => !option.disabled)
+      .map((option) => option.textContent.trim()),
+  );
+
+  expect(availableTimes).not.toContain(time);
 });
 
 Then('o agendamento {string} deve aparecer em Meus Agendamentos com status {string}', async function (customer, status) {
@@ -159,6 +203,16 @@ Then('o agendamento {string} deve aparecer com status {string}', async function 
 
   const appointmentCard = this.page.locator('article').filter({ hasText: customer });
   await expect(appointmentCard.getByText(status)).toBeVisible();
+});
+
+Then('o agendamento {string} deve exibir a nova data e horario', async function (customer) {
+  await this.page.goto('/my-appointments');
+
+  const formattedDate = this.rescheduledAppointment.date.split('-').reverse().join('/');
+  const appointmentCard = this.page.locator('article').filter({ hasText: customer });
+
+  await expect(appointmentCard.getByText(formattedDate)).toBeVisible();
+  await expect(appointmentCard.getByText(this.rescheduledAppointment.time)).toBeVisible();
 });
 
 Then('o dashboard deve exibir {int} agendamento cancelado', async function (quantity) {

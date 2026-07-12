@@ -1,6 +1,6 @@
-# AgendaLab QA - Testes E2E com Playwright
+# AgendaLab QA - Automacao E2E com Playwright e BDD
 
-Projeto de portfolio com um caso de teste ponta a ponta para o site AgendaLab QA:
+Projeto de portfolio com automacao E2E em Playwright e documentacao viva em BDD/Gherkin, baseado nos requisitos funcionais reais do site AgendaLab QA:
 
 https://agendalabqa.vercel.app
 
@@ -39,10 +39,17 @@ Os cenarios automatizados cobrem:
 Tambem existe uma camada BDD com Cucumber + Playwright:
 
 - `features/autenticacao.feature`: acesso protegido, login valido e usuario bloqueado.
-- `features/agendamento.feature`: criacao de agendamento e validacao de telefone.
+- `features/agendamento.feature`: criacao de agendamento, validacao de telefone e conflito de horario.
 - `features/cancelamento.feature`: cancelamento de agendamento confirmado.
+- `features/reagendamento.feature`: alteracao de data e horario de agendamento confirmado.
 - `features/step-definitions/agendalab.steps.js`: steps que executam as acoes no navegador.
 - `features/support/world.js`: configuracao do navegador para cada cenario.
+
+Os cenarios BDD usam tags como `@smoke`, `@regression`, `@auth`, `@appointment`, `@negative` e `@business-rule`.
+
+## Documentacao de QA
+
+- `docs/plano-de-testes.md`: estrategia, escopo, riscos, massa de dados, criterios de aceite e evidencias.
 
 ## Como executar
 
@@ -56,6 +63,14 @@ Para executar os cenarios BDD:
 
 ```bash
 npm run test:bdd
+```
+
+Para executar por tag:
+
+```bash
+npm run test:bdd:smoke
+npm run test:bdd:regression
+npm run test:bdd -- --tags "@business-rule"
 ```
 
 Para executar os cenarios BDD com o navegador aberto:

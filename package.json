@@ -9,7 +9,9 @@
     "report": "playwright show-report",
     "install:browsers": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright playwright install chromium",
     "test:bdd": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright cucumber-js",
-    "test:bdd:headed": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright HEADED=true cucumber-js"
+    "test:bdd:headed": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright HEADED=true cucumber-js",
+    "test:bdd:smoke": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright cucumber-js --tags '@smoke'",
+    "test:bdd:regression": "cross-env PLAYWRIGHT_BROWSERS_PATH=.ms-playwright cucumber-js --tags '@regression'"
   },
   "keywords": [],
   "author": "",

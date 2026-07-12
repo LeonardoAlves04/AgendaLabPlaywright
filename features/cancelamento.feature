@@ -1,4 +1,5 @@
 # language: pt
+@appointment @regression
 Funcionalidade: Cancelamento de agendamento
   Como usuario autenticado
   Quero cancelar um agendamento confirmado
@@ -8,6 +9,7 @@ Funcionalidade: Cancelamento de agendamento
     Dado que estou autenticado como usuario normal
     E os dados de teste foram resetados
 
+  @smoke
   Cenario: Cancelar agendamento confirmado
     Dado que existe um agendamento confirmado para "Cliente Cancelamento BDD"
     Quando acesso a pagina Meus Agendamentos
