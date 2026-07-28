@@ -89,4 +89,3 @@ npm run report
 
 - A tela de login informa `SENHA: SECRET123`, mas os botoes de usuario preenchem `secret123`. O teste usa a senha real aceita pela aplicacao.
 - O teste faz reset dos dados no inicio para manter o cenario independente.
-- As evidencias de exploracao ficam em `artifacts/requirements.json` e `artifacts/site-map.json`.
